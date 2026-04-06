@@ -41,10 +41,25 @@ app.use(errorHandler);
 
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
+  app.listen(PORT, async () => {
     console.log(`\n  Finance Dashboard API`);
     console.log(`  Running on http://localhost:${PORT}`);
     console.log(`  Environment: ${process.env.NODE_ENV || 'development'}\n`);
+
+    // Auto-seed if database has no users
+    try {
+      const { getDb } = require('./models/database');
+      const db = getDb();
+      const { count } = db.prepare('SELECT COUNT(*) as count FROM users').get();
+      if (count === 0) {
+        console.log('  No users found — seeding database...');
+        await require('./seed');
+      } else {
+        console.log(`  Database ready — ${count} user(s) found.\n`);
+      }
+    } catch (e) {
+      console.error('  Seed check failed:', e.message);
+    }
   });
 }
 
