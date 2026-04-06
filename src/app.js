@@ -36,15 +36,6 @@ app.use('/api/users',     userRoutes);
 app.use('/api/records',   recordRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
-// Auto-seed if database is empty
-const { getDb } = require('./models/database');
-const db = getDb();
-const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
-if (userCount === 0) {
-  console.log('Database empty — running seed...');
-  require('./seed');
-}
-
 app.use(notFound);
 app.use(errorHandler);
 
